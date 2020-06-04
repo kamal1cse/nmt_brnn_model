@@ -1,0 +1,94 @@
+
+
+cd D:\MT\OpenNMT(pytorch1.2)\OpenNMT-py-master
+
+Preprocessing commnad
+===================================================================
+
+
+#diff vocalbulary 70000,90000,100000
+onmt_preprocess -train_src march2020/nmt(brnn)/trainclean.pun -train_tgt march2020/nmt(brnn)/trainclean.eng -valid_src march2020/nmt(brnn)/tune.pun -valid_tgt march2020/nmt(brnn)/tune.eng -save_data march2020/nmt(brnn)/demo -src_vocab_size 70000 -tgt_vocab_size 70000
+
+onmt_preprocess -train_src march2020/nmt(brnn)/trainclean.pun -train_tgt march2020/nmt(brnn)/trainclean.eng -valid_src march2020/nmt(brnn)/tune.pun -valid_tgt march2020/nmt(brnn)/tune.eng -save_data march2020/nmt(brnn)/demo1 -src_vocab_size 90000 -tgt_vocab_size 90000
+
+
+onmt_preprocess -train_src march2020/nmt(brnn)/trainclean.pun -train_tgt march2020/nmt(brnn)/trainclean.eng -valid_src march2020/nmt(brnn)/tune.pun -valid_tgt march2020/nmt(brnn)/tune.eng -save_data march2020/nmt(brnn)/demo2 -src_vocab_size 100000 -tgt_vocab_size 100000
+
+
+Train bidirectioal rnn  commnad
+===================================================================
+python train.py -encoder_type brnn -layers 4 -global_attention mlp -data kamalbrnn2/demo -save_model kamalbrnn2/demo-model -save_checkpoint_steps 4068 -world_size 1 -gpu_ranks 0 -train_steps 162720
+
+
+sentence 255706
+255706/64 = 3995.4
+50 epochs=199770
+
+255706/32 = 7990.8
+25 epochs=199770
+
+#used demo2 files and saved to demo-model2
+demo2 trained using 32 batch size
+#32 batch size
+onmt_train -encoder_type brnn -layers 4 -input_feed 1 -batch_size 32 -global_attention mlp -data march2020/nmt(brnn)/demo2 -save_model march2020/nmt(brnn)/demo-model2 -save_checkpoint_steps 7991 -train_from march2020/nmt(brnn)/demo-model2_step_95892.pt -world_size 1 -gpu_ranks 0 -train_steps 199775
+
+onmt_train -encoder_type brnn -layers 4 -input_feed 1 -batch_size 32 -global_attention mlp -data march2020/nmt(brnn)/demo2 -save_model march2020/nmt(brnn)/demo-model2 -save_checkpoint_steps 3996 -world_size 1 -gpu_ranks 0 -train_steps 199775
+
+
+#64 batch size
+onmt_train -encoder_type brnn -layers 4 -input_feed 1 -batch_size 64 -global_attention mlp -data march2020/nmt(brnn)/demo2 -save_model march2020/nmt(brnn)/demo-model2 -save_checkpoint_steps 3996 -world_size 1 -gpu_ranks 0 -train_steps 199775
+
+
+
+-enc_rnn_size 			1000
+-dec_rnn_size 			1000
+-input_feed 			True 1
+-global_attention_function 	softmax,sparsemax
+-batch_type 			sents
+-optim 				sgd, adagrad, adadelta, adam, sparseadam, adafactor, fusedadam
+-batch_size 			32
+
+Test commnad
+===================================================================
+
+
+s='demo-model2_step_135847.pt'
+os.system("onmt_translate  -model march2020/nmt(brnn)/"+s+" -src march2020/nmt(brnn)/test.pun -output march2020/nmt(brnn)/test_pred_brnn_17_epoch_dictnory.txt -replace_unk -phrase_table march2020/nmt(brnn)/OutputDic.txt")
+
+onmt_translate  -model march2020/nmt(brnn)/demo-model2_step_135847.pt -src march2020/nmt(brnn)/test.pun -output march2020/nmt(brnn)/test_pred_brnn_17_epoch_dictnory.txt -replace_unk -phrase_table march2020/nmt(brnn)/OutputDic.txt
+
+#replace option
+onmt_translate  -model march2020/nmt(brnn)/demo-model2_step_135847.pt -src march2020/nmt(brnn)/test.pun -output march2020/nmt(brnn)/test_pred_brnn_17_epoch_dictnory.txt -replace_unk -phrase_table march2020/nmt(brnn)/OutputDic.txt -verbose
+
+onmt_translate  -model march2020/nmt(brnn)/demo-model2_step_135847.pt -src march2020/nmt(brnn)/test.pun -output march2020/nmt(brnn)/test_pred_brnn_17_epoch_dictnory.txt -replace_unk true -phrase_table march2020/nmt(brnn)/OutputDic.txt -verbose
+
+
+onmt_translate  -model NMTTDIL1/demo-model_step_90840.pt -src NMTTDIL1/test.pun -output NMTTDIL1/testpred90.eng -replace_unk -verbose
+
+
+
+===================================================================
+
+#with preproceesing testing
+onmt_translate  -model NMTTDIL1(BRNN)/demo-model_step_90840.pt -src NMTTDIL1(BRNN)/test_tdil_preoprocessing.pun -output NMTTDIL1(BRNN)/test_tdil_withpreprocessing_pred90.eng -replace_unk -verbose
+
+
+#with preproceesing and WORD EMBEDDING
+onmt_translate  -model NMTTDIL1(BRNN)/demo-model8feb_step_90840.pt -src NMTTDIL1(BRNN)/test_tdil_preoprocessing.pun -output NMTTDIL1(BRNN)/test_tdil_withpreprocessing_WE_pred90.eng -replace_unk -verbose
+
+onmt_translate  -model NMTTDIL1/demo-model_step_75000.pt -src NMTTDIL1/test.pun -output NMTTDIL1/testpred75.eng -replace_unk -verbose
+
+onmt_translate  -model NMTTDIL1(BRNN)/demo-model_step_81756.pt -src NMTTDIL1(BRNN)/test.pun -output NMTTDIL1(BRNN)/testpred81.eng -replace_unk -verbose
+
+#word embedding
+onmt_translate  -model NMTTDIL1(BRNN)/demo-model8feb_step_81756.pt -src NMTTDIL1(BRNN)/test.pun -output NMTTDIL1(BRNN)/testpred81_1.eng -replace_unk -verbose
+onmt_translate  -model NMTTDIL1(BRNN)/demo-model8feb_step_90840.pt -src NMTTDIL1(BRNN)/test.pun -output NMTTDIL1(BRNN)/testpred90_1.eng -replace_unk -verbose
+
+
+
+BLEU SCORE
+
+===================================================================
+perl  tools/multi-bleu.perl NMTTDIL1(BRNN)/ref.txt < NMTTDIL1(BRNN)/pred.txt
+
+

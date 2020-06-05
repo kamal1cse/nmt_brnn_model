@@ -1,0 +1,14 @@
+Statistics about input files
+-------------------------------------------------------
+Number of words in reference: 9723
+Number of words in test: 9469
+Number of unknown words (marked with a star) in test: 0
+Percentage of unknown words: 0.00 %
+
+Results when removing unknown-word marks (stars)
+-------------------------------------------------------
+Edit distance: 3353
+Word error rate (WER): 34.49 %
+Number of position-independent correct words: 7145
+Position-independent word error rate (PER): 26.51 %
+

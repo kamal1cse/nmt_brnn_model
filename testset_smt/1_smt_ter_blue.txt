@@ -1,0 +1,21 @@
+#smt ter
+
+perl apertium-eval-translator-master/apertium-eval-translator-master/apertium-eval-translator-line.pl -t testset_smt/testpredsmt.eng -r testset_smt/testref.eng > testset_smt/8_TER_SMT_complete.txt
+
+perl apertium-eval-translator-master/apertium-eval-translator-master/apertium-eval-translator-line.pl -t testset_smt/13testpredSmall.eng -r testset_smt/12testRefSmall.eng > testset_smt/9_TER_SMT_small.txt
+
+perl apertium-eval-translator-master/apertium-eval-translator-master/apertium-eval-translator-line.pl -t testset_smt/17testpredMedium.eng -r testset_smt/16testRefMedium.eng > testset_smt/10_TER_SMT_medium.txt
+
+perl apertium-eval-translator-master/apertium-eval-translator-master/apertium-eval-translator-line.pl -t testset_smt/21testpredLarge.eng -r testset_smt/20testRefLarge.eng > testset_smt/11_TER_SMT_large.txt
+
+
+
+#blue score smt 
+perl  tools/multi-bleu.perl testset_smt/testref.eng < testset_smt/testpredsmt.eng > testset_smt/4_BLEU_SMT_complete.txt
+
+
+perl  tools/multi-bleu.perl testset_smt/12testRefSmall.eng < testset_smt/13testpredSmall.eng > testset_smt/5_BLEU_SMT_small.txt
+
+perl  tools/multi-bleu.perl testset_smt/16testRefMedium.eng < testset_smt/17testpredMedium.eng > testset_smt/6_BLEU_SMT_medium.txt
+
+perl  tools/multi-bleu.perl testset_smt/20testRefLarge.eng < testset_smt/21testpredLarge.eng > testset_smt/7_BLEU_SMT_large.txt
